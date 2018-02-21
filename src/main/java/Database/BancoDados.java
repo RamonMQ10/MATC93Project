@@ -10,7 +10,7 @@ public class BancoDados {
 	public Connection conectaBanco() {
 		try {
 			return DriverManager.getConnection(
-					"jdbc:mysql://localhost/matc93?useTimezone=true&serverTimezone=UTC", "root", "kyugin");
+					"jdbc:mysql://localhost/matc93?useTimezone=true&serverTimezone=UTC", "root", "");
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
