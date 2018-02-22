@@ -5,34 +5,37 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import Model.Movie;
+
 public class BancoDados {
 	
 	public Connection conectaBanco() {
 		try {
 			return DriverManager.getConnection(
-					"jdbc:mysql://localhost/matc93?useTimezone=true&serverTimezone=UTC", "root", "");
+					"jdbc:mysql://localhost/matc93?useTimezone=true&serverTimezone=UTC&useSSL=false", "root", "");
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public void insereFilme(String name, String country, String varAbstract, String budget, String  releaseDate, String runtime, String alternateTitle, String starring , String director , String producer) {
+	public void insereFilme(Movie movie) {
 		Connection conn = conectaBanco();
 		PreparedStatement ps = null;
 
-		String query = "INSERT INTO `movie` (`name`, `country`, `abstract`, `budget`, `releaseDate`, `runtime`, `alternateTitle`, `starring`, `director`, `producer`) VALUES (?,?,?,?,?,?,?,?,?,?)";
+		String query = "INSERT INTO `movie` (`name`, `country`, `abstract`, `budget`, `releaseDate`, `runtime`, `alternateTitle`, `starring`, `director`, `producer`, `genre`) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 		try {
 			ps = conn.prepareStatement(query);
-			ps.setString(1, name);
-			ps.setString(2, country);
-			ps.setString(3, varAbstract);
-			ps.setString(4, budget);
-			ps.setString(5, releaseDate);
-			ps.setString(6, runtime);
-			ps.setString(7, alternateTitle);
-			ps.setString(8, starring);
-			ps.setString(9, director);
-			ps.setString(10, producer);
+			ps.setString(1, movie.getName());
+			ps.setString(2, movie.getCountry());
+			ps.setString(3, movie.getVarAbstract());
+			ps.setString(4, movie.getBudget());
+			ps.setString(5, movie.getReleaseDate());
+			ps.setString(6, movie.getRuntime());
+			ps.setString(7, movie.getAlternateTitle());
+			ps.setString(8, movie.getStarring());
+			ps.setString(9, movie.getDirector());
+			ps.setString(10, movie.getProducer());
+			ps.setString(11, movie.getGenre());
 			ps.execute();
 			ps.close();
 			conn.close();

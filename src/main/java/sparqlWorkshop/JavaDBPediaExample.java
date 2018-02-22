@@ -15,15 +15,16 @@ import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Resource;
 
 import Database.BancoDados;
+import Model.Movie;
 
 public class JavaDBPediaExample {
 	
 	static BancoDados bancoDados;
 
-	public static List<String> lerArquivoMovieLens() {
+	public static List<Movie> lerArquivoMovieLens() {
 
 		int i = 1;
-		List<String> filmes = new ArrayList<String>();
+		List<Movie> filmes = new ArrayList<Movie>();
 
 		try {
 			FileReader fileReader = new FileReader("u.item");
@@ -34,7 +35,7 @@ public class JavaDBPediaExample {
 			while (linha != null) {
 
 				String[] valores = linha.split("#");
-
+				String generos="";
 				if (valores.length > 1) {
 
 					String filme[] = valores[1].split(" ");
@@ -45,10 +46,29 @@ public class JavaDBPediaExample {
 
 						tituloFilme = tituloFilme.concat(" " + filme[x]);
 					}
+					
+					for (int  j= 5; j < valores.length; j++) {
+						
+						if(valores[j].equals("1")){
+							
+							String genero = buscaGenero(j);
+							
+							if(generos.equals("")){
+								
+								generos = generos.concat(genero);
+							}else{
+								generos = generos.concat(", "+genero);
+								
+							}
+						}
 
-					filmes.add(tituloFilme);
+						
+					}
 
-					//System.out.println("Filme " + i + " Titulo: " + tituloFilme);
+					Movie movie = new Movie(tituloFilme,generos,"","","","","","","","","");
+					filmes.add(movie);
+
+					System.out.println("Filme " + i + " Titulo: " + tituloFilme+" Generos: "+generos);
 
 					i++;
 				}
@@ -68,46 +88,77 @@ public class JavaDBPediaExample {
 		return filmes;
 
 	}
+	
+	public static String buscaGenero(int posicao){
+		
+		String genero="";
+		
+		switch(posicao){
+		
+		case 5: genero="Unknown"; break;
+		case 6: genero="Action"; break;
+		case 7: genero="Adventure"; break;
+		case 8: genero="Animation"; break;
+		case 9: genero="Children"; break;
+		case 10: genero="Comedy"; break;
+		case 11: genero="Crime"; break;
+		case 12: genero="Documentary"; break;
+		case 13: genero="Drama"; break;
+		case 14: genero="Fantasy"; break;
+		case 15: genero="Film-Noir"; break;
+		case 16: genero="Horror"; break;
+		case 17: genero="Musical"; break;
+		case 18: genero="Mystery"; break;
+		case 19: genero="Romance"; break;
+		case 20: genero="Sci-Fi"; break;
+		case 21: genero="Thriller"; break;
+		case 22: genero="War"; break;
+		case 23: genero="Western"; break;
+		
+		}
+		
+		return genero;
+	}
 
-	public static void insertData(String name, String country, String varAbstract, String budget, String releaseDate,
-			String runtime, String alternateTitle, String starring , String director , String producer) {
+	public static void insertData(Movie movie) {
 
-		if (!name.equals("")) {
-			String dados[] = name.split("\"");
-			name = dados[1];
+		if (!movie.getName().equals("")) {
+			String dados[] = movie.getName().split("\"");
+			movie.setName(dados[1]);
 		}
 
-		if (!country.equals("")) {
-			String dados[] = country.split("\"");
-			country = dados[1];
+		if (!movie.getCountry().equals("")) {
+			String dados[] = movie.getCountry().split("\"");
+			movie.setCountry(dados[1]);
 		}
 
-		if (!varAbstract.equals("")) {
-			String dados[] = varAbstract.split("\"");
-			varAbstract = dados[1];
+		if (!movie.getVarAbstract().equals("")) {
+			String dados[] = movie.getVarAbstract().split("\"");
+			movie.setVarAbstract(dados[1]);
 		}
 
-		if (!budget.equals("")) {
-			String dados[] = budget.split("\"");
-			budget = dados[1];
+		if (!movie.getBudget().equals("")) {
+			String dados[] = movie.getBudget().split("\"");
+			movie.setBudget(dados[1]);
 		}
 
-		if (!releaseDate.equals("")) {
-			String dados[] = releaseDate.split("\"");
-			releaseDate = dados[1];
+		if (!movie.getReleaseDate().equals("")) {
+			String dados[] = movie.getReleaseDate().split("\"");
+			movie.setReleaseDate(dados[1]);
 		}
 
-		if (!runtime.equals("")) {
-			String dados[] = runtime.split("\"");
-			runtime = dados[1];
+		if (!movie.getRuntime().equals("")) {
+			String dados[] = movie.getRuntime().split("\"");
+			 movie.setRuntime(dados[1]);
 		}
 
-		if (!alternateTitle.equals("")) {
-			String dados[] = alternateTitle.split("\"");
-			alternateTitle = dados[1];
+		if (!movie.getAlternateTitle().equals("")) {
+			String dados[] = movie.getAlternateTitle().split("\"");
+			movie.setAlternateTitle(dados[1]);
 		}
-
-		bancoDados.insereFilme(name, country, varAbstract, budget, releaseDate, runtime, alternateTitle, starring , director , producer);
+		
+		
+		bancoDados.insereFilme(movie);
 
 	}
 
@@ -115,13 +166,13 @@ public class JavaDBPediaExample {
 
 		bancoDados = new BancoDados();
 		
-		List<String> filmes = lerArquivoMovieLens();
+		List<Movie> filmes = lerArquivoMovieLens();
 
 		int t = 0, possuiApenas1Resultado = 0, possuiMaisDe1Resultado = 0;
 
 		for (int i = 0; i < filmes.size(); i++) {
 
-			if (filmes.get(i).contains("'")) {
+			if (filmes.get(i).getName().contains("'")) {
 
 				t++;
 			}
@@ -138,11 +189,11 @@ public class JavaDBPediaExample {
 
 		for (int i = 0; i < filmes.size(); i++) {
 
-			if (!filmes.get(i).contains("'")) {
+			if (!filmes.get(i).getName().contains("'")) {
 
-				String name = "", country = "", varAbstract = "", budget = "", releaseDate = "", runtime = "",
-						alternateTitle = "", starring = "", director = "", producer = "";
-
+				String nomeFilme = filmes.get(i).getName();
+				String starring="" , director="" , producer="";
+				
 				String queryGeral = prefixos
 						+ "SELECT DISTINCT ?name ?country ?abstract ?budget  ?releaseDate ?runtime ?alternateTitle "
 
@@ -152,7 +203,7 @@ public class JavaDBPediaExample {
 
 						+ " ?instance foaf:name ?name . "
 
-						+ " FILTER REGEX (?name, '^" + filmes.get(i) + "$', 'i'). " + " OPTIONAL { "
+						+ " FILTER REGEX (?name, '^" + nomeFilme + "$', 'i'). " + " OPTIONAL { "
 						+ "    ?instance dbpprop:country ?country  " + " } " + "OPTIONAL { "
 						+ "?instance dbpedia-owl:abstract ?abstract . " + " FILTER (LANG(?abstract) = 'en'). " + "} "
 						+ "OPTIONAL { " + "?instance dbpedia-owl:budget ?budget  " + "} " + "OPTIONAL { "
@@ -183,22 +234,23 @@ public class JavaDBPediaExample {
 					for (int z = 0; z < dados.length; z++) {
 						
 						if (dados[z].contains("?name")) {
-							name = dados[z];
+							filmes.get(i).setName(dados[z]);
 						} else if (dados[z].contains("?country")) {
-							country = dados[z];
+							filmes.get(i).setCountry(dados[z]);
 						} else if (dados[z].contains("?abstract")) {
-							varAbstract = dados[z];
+							filmes.get(i).setVarAbstract(dados[z]);
 						} else if (dados[z].contains("?budget")) {
-							budget = dados[z];
+							filmes.get(i).setBudget(dados[z]);
 						} else if (dados[z].contains("?releaseDate")) {
-							releaseDate = dados[z];
+							filmes.get(i).setReleaseDate(dados[z]);
 						} else if (dados[z].contains("?runtime")) {
-							runtime = dados[z];
+							filmes.get(i).setRuntime(dados[z]);
 						} else if (dados[z].contains("?alternateTitle")) {
-							alternateTitle = dados[z];
+							filmes.get(i).setAlternateTitle(dados[z]);
 						}
 
 					}
+				
 					
 					String queryStarring  = prefixos
 							+ "SELECT DISTINCT ?name ?starring "
@@ -209,7 +261,7 @@ public class JavaDBPediaExample {
 
 							+ " ?instance foaf:name ?name . "
 
-							+ " FILTER REGEX (?name, '^" + filmes.get(i) + "$', 'i'). "
+							+ " FILTER REGEX (?name, '^" + nomeFilme + "$', 'i'). "
 							+ "OPTIONAL { " + "?instance dbpedia-owl:starring ?starring  " + "} " + "}";
 
 					QueryExecution queryExecutionStarring = QueryExecutionFactory.sparqlService("http://dbpedia.org/sparql",
@@ -250,7 +302,7 @@ public class JavaDBPediaExample {
 
 							+ " ?instance foaf:name ?name . "
 
-							+ " FILTER REGEX (?name, '^" + filmes.get(i) + "$', 'i'). "
+							+ " FILTER REGEX (?name, '^" + nomeFilme + "$', 'i'). "
 							+ "OPTIONAL { " + "?instance dbpedia-owl:director ?director  " + "} " + "}";
 
 					QueryExecution queryExecutionDirector = QueryExecutionFactory.sparqlService("http://dbpedia.org/sparql",
@@ -291,7 +343,7 @@ public class JavaDBPediaExample {
 
 							+ " ?instance foaf:name ?name . "
 
-							+ " FILTER REGEX (?name, '^" + filmes.get(i) + "$', 'i'). "
+							+ " FILTER REGEX (?name, '^" + nomeFilme + "$', 'i'). "
 							+ "OPTIONAL { " + "?instance dbpedia-owl:producer ?producer  " + "} " + "}";
 
 					QueryExecution queryExecutionProducer = QueryExecutionFactory.sparqlService("http://dbpedia.org/sparql",
@@ -322,8 +374,8 @@ public class JavaDBPediaExample {
 						
 					}
 					
-
-					insertData(name, country, varAbstract, budget, releaseDate, runtime, alternateTitle, starring , director , producer);
+					filmes.get(i).setStarring(starring); filmes.get(i).setDirector(director);; filmes.get(i).setProducer(producer);
+					insertData(filmes.get(i));
 					System.out.println("Inseriu: " + possuiApenas1Resultado);
 					possuiApenas1Resultado++;
 				} else if (querySolution.size() > 1) {
